@@ -72,15 +72,23 @@ Use the Python VScode plugin to create a new Virtual environment (venv) using a 
  .\.venv\Scripts\activate
 ```
 
+**How do follow along**
+
+Given the non deterministic nature of generative AI tools, the output you will get from running these prompts will be different to the output I got when creating this. You might be asking yourself, how will I know what is right or wrong, and how will I cope if things go horribly wrong? This is kind of intentional. Working with generative AI tools like Amazon Q Developer open you up to a new flow, a new way of working. If your expectation was that these tools will generate working code every time, then it is time to reset that expectation. The output that these tools provide will be your starting point, and get you 80% of the way there. You can then use Amazon Q Developer to help iterate and complete the remaining. If that does not work, at each different section of this lab, the git repo has a number of checkpoints. These have been implemented as branches, so you can start off without worrying if the previous lab failed.
+
+Everyone running through this lab will have a different experience, but I hope the takeaway from this is a better understanding of the flow you will start to develop in using these tools to write software.
+
+If you are working through this in a group setting, then the person running the lab will lead from the front and you can take your guidance from them.
+
 #  Introduction to next generation developer tools (45 min)
 
-In this 30 min lecture, we will cover a quick overview of what we mean by generative AI developer tools, the typical use cases where developers can apply them, take a look at developer journeys in more detail, before finishing up with some tips as to how to use them effectively.
+To kick things off you will look at a quick overview of what we mean by generative AI developer tools. This will take a look at the typical use cases where developers can apply them, take a look at developer journeys in more detail, before finishing up with some tips as to how to use them effectively.
 
-This will set you up nicely for the practical hands on element.
+This will set you up nicely for the practical hands on element, where we will actually do some of those use cases.
 
 # Setting up, and getting starting with Amazon Q Developer (20 min)
 
-In this 90 minute hands on section, we are going to be using Amazon Q Developer, a next generation developer tool that provides you with in-line code suggestions and a chat interface to help your developer flow. This is installed into your IDE (VSCode and IntelliJ are supported) via a plugin. Once the plugin is installed, we need to login using something that is called a Builder ID. This allows you to access the Free Tier of Amazon Q Developer, without the need for an AWS account. So we first need to set that up, and then install the Amazon Q Developer plugin.
+We are now ready for the first hands on part of this lab, setting up the generative AI developer tooling we are going to be using. We are going to be using Amazon Q Developer, a next generation developer tool that provides you with in-line code suggestions and a chat interface to help your developer flow. This is installed into your IDE (VSCode and IntelliJ are supported) via a plugin. Once the plugin is installed, we need to login using something that is called a Builder ID account. This allows you to access the Free Tier of Amazon Q Developer, without the need for an AWS account. So we first need to set that up, and then install the Amazon Q Developer plugin.
 
 **Creating your Builder ID**
 
