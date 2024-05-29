@@ -57,7 +57,7 @@ python -m venv ada-lab
 cd ada-lab
 source bin/activate
 git clone https://github.com/094459/ada-python-demo-app.git
-cd ada-python-demo-app/finch
+cd ada-python-demo-app
 ```
 Windows
 ```
@@ -312,7 +312,6 @@ In this next lab we are going to use Amazon Q Developer to show how easy it is t
 
 ```
 git checkout broken
-git push -u origin broken
 ```
 
 Try running the application again. Does it run? Ok, now try using the application to add a new URL. You should now encounter an error which you will see both on the browser, but also in the terminal window where you ran the application.
@@ -327,8 +326,81 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 ---
 
+**Lab 01-3 In code suggestions**
 
-**Lab 01-3 Security Scan**
+In this next lab, we are going to use Amazon Q Developer to help us speed up how to write our code within the editor itself. We will not be using the Amazon Q Developer chat panel, we will be activating the suggestions using Python's comment symbol # (if you are trying this for other languages, you will use the commenting symbols that language uses)
+
+Place your cursor a line 8 in the app.py and hit return a couple of times.
+
+```
+from flask import Flask, render_template, request, redirect
+import string
+import random
+
+app = Flask(__name__)
+
+url_mapping = {}
+<-- here
+```
+
+From the beginning of the line, type the following:
+
+```
+# Create a function that returns a random quote that features Yoda
+```
+
+When you hit return, you should see "Amazon Q is generatring...." and after a few seconds, it should suggest some code. 
+
+![Amazon Q Developer suggestion](images/yoda-q-choice-1.png)
+
+You will notice this is greyed out. We can use the Amazon Q Developer keyboard shortcuts of < and > to switch been different suggestions. Hit the > and you will see a different code.
+
+![Amazon Q Developer alternative code suggestion](images/yoda-q-choice-2.png)
+
+I like this one better. To accept the code we hit TAB.
+
+You will notice that this code is not actually complete. It leaves this open for me to add any other quotes that I might to return. In this instance I am happy with the selection, so I just hit backspace to remove the comma, and then close the array by typing the ]
+
+![Closing the function](images/yoda-close-braket.png)
+
+When I hit return, you will notice that Amazon Q Developer is not done suggesting stuff. It would like me to add a new route to this application (/) so that it can display a quote. We can hit TAB to accept that, we now have a new route.
+
+![New route added](images/yoda-add-route.png)
+
+As it stands, if we run this code it will not work as there is no index.html within this application. We need to create this. From the templates folder, add a new file called "index.html".
+
+At this point it is worth noting that the inline suggestions do not work for html, so we cannot ask Amazon Q Developer like we just did to add the code. We can however, ask the Amazon Q Developer Chat panel. So lets do that.
+
+```
+Provide the html code for the index.html page that will display the yoda_quote
+```
+
+You can see the output it generates here. 
+
+![Asking Amazon Q Developer for the index.html code](images/yoda-html.png)
+
+I add this code to the index.html, and save the file. When I now run this application, youy
+
+![Adding inspirational messages](images/yoda-motd.png)
+
+
+> **If you cannot get this to work**
+> If you struggle to get the code to work, you can use the code in the repo in the persist branch. Access this by using the following command:
+> 
+> ```
+> git checkout inline
+> ```
+> You will notice that files update in your local repo.
+>
+
+
+Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+
+**Complete:** When you have managed to created a new function and can now run the application, you can proceed to the next lab.
+
+---
+
+**Lab 01-4 Security Scan**
 
 When we were exploring some of the capabilities that Amazon Q Developer provides, performing Security Scans was one of these. Using the Amazon Q menu options, kick off a Security Scan.
 
