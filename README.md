@@ -29,9 +29,8 @@ You will need VScode IDE (or as an alternative, IntelliJ) with the following VSC
 
 * Amazon Q Developer plugin - https://marketplace.visualstudio.com/items?itemName=AmazonWebServices.amazon-q-vscode
 * * [Download v1.3](https://github.com/aws/aws-toolkit-vscode/releases/download/amazonq/v1.3.0/amazon-q-vscode-1.3.0.vsix) - do not use (1.4) 
-* Database Client JDBC - https://marketplace.visualstudio.com/items?itemName=cweijan.dbclient-jdbc
 * Python plugin for VScode - https://marketplace.visualstudio.com/items?itemName=ms-python.python
-* PostgreSQL cli tools  (brew install postgresql | use the windows installer to just install the cli tools)
+* PostgreSQL cli tools - "brew install postgresql" (Mac) , use the windows installer to just install the cli tools (windows), or "sudo apt get install libpq-dev" (Ubuntu),"sudo dnf install libpq-devel" (Fedora)
 * Python 3.10 or newer
 * git
 
@@ -65,82 +64,6 @@ Use the Python VScode plugin to create a new Virtual environment (venv) using a 
 ```
  .\.venv\Scripts\activate
 ```
-
-
-**Start a local Postgres database**
-
-This lab will need a running Postgres database. We will be using Docker to get one locally up and running. If you do not have or are allowed to have Docker installed, please speak with the instructor - they will provide a suitable workaround that will allow you to connect to a Postgres database.
-
-Follow these instructions if you DO have Docker running locally. 
-
-In this directory we have our docker compose file, which we can see provides a very simple setup for running a local PostgreSQL database.
-
-```
-version: '3'
-volumes:
-  psql:
-services:
-  psql:
-    image: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: change-me
-    volumes:
-      - psql:/var/lib/postgresql/data 
-    ports:
-      - 5432:5432% 
-```
-Take note of the username (postgres) and password (change-me) that will get configured for this local Postgres database. It will use the standard port of 5432.
-
-To start our Postgres database (make sure you are in the finch directory)
-
-```
-cd finch
-docker compose -p local-postgres -f postgres.yml up
-```
-You should see output that looks similar to the following:
-
-```
-INFO[0000] Creating network local-postgres_default      
-INFO[0000] Ensuring image postgres                      
-INFO[0000] Creating container local-postgres-psql-1     
-INFO[0000] Attaching to logs                            
-psql-1 |
-psql-1 |PostgreSQL Database directory appears to contain a database; Skipping initialization
-psql-1 |
-psql-1 |2024-05-15 16:18:45.413 UTC [1] LOG:  starting PostgreSQL 16.2 (Debian 16.2-1.pgdg120+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
-psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
-psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv6 address "::", port 5432
-psql-1 |2024-05-15 16:18:45.416 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
-psql-1 |2024-05-15 16:18:45.420 UTC [29] LOG:  database system was interrupted; last known up at 2024-05-14 13:34:27 UTC
-psql-1 |2024-05-15 16:18:45.514 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
-psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  redo starts at 0/1E4F2B8
-psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  invalid record length at 0/1E4F3A0: expected at least 24, got 0
-psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  redo done at 0/1E4F368 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
-psql-1 |2024-05-15 16:18:45.521 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
-psql-1 |2024-05-15 16:18:45.528 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1E4F3A0, redo lsn=0/1E4F3A0
-psql-1 |2024-05-15 16:18:45.531 UTC [1] LOG:  database system is ready to accept connections
-```
-
-Leave this up and running in a command window as we will need to connect to this as we build our application.
-
-> **Stopping the local Postgres database**
->
->To stop the Postgres database, use CTRL + C
->
->```
->^CINFO[0119] Stopping containers (forcibly)               
->INFO[0119] Stopping container local-postgres-psql-1  
->```
->
-> and then type the following
->
->```
->docker compose -p local-postgres -f postgres.yml down
->```
->Which will return you back to the command line.
->
-
 
 #  Introduction to next generation developer tools (45 min)
 
@@ -389,7 +312,7 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 In this next lab we are going to use Amazon Q Developer to show how easy it is to fix bugs whilst you are working and in the flow. We need to first switch to a branch of the code that we have deliberately broken. From the VScode terminal run the following command
 
 ```
-git checkout -b broken
+git checkout broken
 git push -u origin broken
 ```
 
@@ -681,3 +604,104 @@ If you want to remove the installed VScode plugins, from VSCode make sure you go
 3. Try and recreate this application in a different programming language
 4. Try creating the application from scratch using the /dev capabilitiy of Amazon Q Developer
 
+
+
+## Creating supporting resources to run this lab
+
+
+To get the most from this lab, you will need to be running VSCode, and be able to install and run a few other components (Docker, VSCode Amazon Q Developer plugins, etc). If you are not able to do this, then what are your options? I have successfully run this lab using [GitPods](https://gitpod.io/workspaces) although I had to run a Postgres database separately (I used an Amazon RDS instance to do this). Alternatively you can spin up a VSCode environment on an EC2 instance.
+
+**Setting up VSCode on EC2**
+
+If you have access to an AWS account, then you can use [the following Cloudformation template](https://aws-oss.beachgeek.co.uk/3xa) to deploy VSCode server on an EC2 instance. After downloading this gist locally, log into the AWS account you want to use. From the AWS CloudFormation console, go to CREATE NEW STACK, and then use the UPLOAD A TEMPLATE FILE option, selecting the downloaded template. You can accept the defaults (you will need to give it a name), and deployment will only take 5-10 minutes. Once deployed, from the OUTPUTs tab, you will see two things you need to access your new VSCode cloud desktop - a URL link to it, and a password. Click on the link, and then enter the password and you should then be presented with VSCode.
+
+![Running VSCode in EC2](/images/ada-q-ec2-vscode.png)
+
+This has all the developer tools you will need to run this lab, as well as experiment with other programming languages such as Java, Rust, .NET, and Node.
+
+I have been running this for a week, and the daily cost is around $1.50.
+
+After you have finished, make sure you clean up and delete all the resources. From the AWS CloudFormation console, select the stack and then use the DELETE STACK option to remove your VSCode on EC2 environment.
+
+**Setting up a local Postgres database**
+
+If you want to run one locally, you can use the following which uses Docker Compose (or Finch if you are using that) to spin up a local Postgres database.
+
+
+*Start a local Postgres database*
+
+This lab will need a running Postgres database. We will be using Docker to get one locally up and running. If you do not have or are allowed to have Docker installed, please speak with the instructor - they will provide a suitable workaround that will allow you to connect to a Postgres database.
+
+Follow these instructions if you DO have Docker running locally. 
+
+In this directory we have our docker compose file, which we can see provides a very simple setup for running a local PostgreSQL database.
+
+```
+version: '3'
+volumes:
+  psql:
+services:
+  psql:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - psql:/var/lib/postgresql/data 
+    ports:
+      - 5432:5432% 
+```
+Take note of the username (postgres) and password (change-me) that will get configured for this local Postgres database. It will use the standard port of 5432.
+
+To start our Postgres database (make sure you are in the finch directory)
+
+```
+cd finch
+docker compose -p local-postgres -f postgres.yml up
+```
+You should see output that looks similar to the following:
+
+```
+INFO[0000] Creating network local-postgres_default      
+INFO[0000] Ensuring image postgres                      
+INFO[0000] Creating container local-postgres-psql-1     
+INFO[0000] Attaching to logs                            
+psql-1 |
+psql-1 |PostgreSQL Database directory appears to contain a database; Skipping initialization
+psql-1 |
+psql-1 |2024-05-15 16:18:45.413 UTC [1] LOG:  starting PostgreSQL 16.2 (Debian 16.2-1.pgdg120+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+psql-1 |2024-05-15 16:18:45.416 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+psql-1 |2024-05-15 16:18:45.420 UTC [29] LOG:  database system was interrupted; last known up at 2024-05-14 13:34:27 UTC
+psql-1 |2024-05-15 16:18:45.514 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  redo starts at 0/1E4F2B8
+psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  invalid record length at 0/1E4F3A0: expected at least 24, got 0
+psql-1 |2024-05-15 16:18:45.518 UTC [29] LOG:  redo done at 0/1E4F368 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql-1 |2024-05-15 16:18:45.521 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+psql-1 |2024-05-15 16:18:45.528 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1E4F3A0, redo lsn=0/1E4F3A0
+psql-1 |2024-05-15 16:18:45.531 UTC [1] LOG:  database system is ready to accept connections
+```
+
+Leave this up and running in a command window as we will need to connect to this as we build our application.
+
+> **Stopping the local Postgres database**
+>
+>To stop the Postgres database, use CTRL + C
+>
+>```
+>^CINFO[0119] Stopping containers (forcibly)               
+>INFO[0119] Stopping container local-postgres-psql-1  
+>```
+>
+> and then type the following
+>
+>```
+>docker compose -p local-postgres -f postgres.yml down
+>```
+>Which will return you back to the command line.
+>
+
+In addition, you may find the following VSCode plugin useful for connecting to local databases. With the trial/free version, it allows you to connect to three databases.
+
+* Database Client JDBC - https://marketplace.visualstudio.com/items?itemName=cweijan.dbclient-jdbc
