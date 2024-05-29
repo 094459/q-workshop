@@ -4,11 +4,11 @@
 
 *A hands on guide to working with Amazon Q Developer. Made by DevRel with 💖.*
 
-In this hands on workshop, we are going to run through how to use the next generation of developer tooling to help make our jobs as developers more enjoyable and productive.
+In this hands on lab, we are going to run through how to use the next generation of developer tooling to help make our jobs as developers more enjoyable and productive.
 
 We will create a new application from scratch, and then build upon this and perform many of the tasks you would typically do as a developer. 
 
-One thing to bear in mind before we start. Unlike other workshops, because of the non deterministic nature of these tools, there is no guarantee that the output will be the same as what your peers will see. What that means is that if you are working in groups, you can all expect different outputs. We have provided a [sample repo]() that you can use as a baseline, but we encourage you to explore and work with your own experiments - this is the most effective way of learning how these tools work.
+One thing to bear in mind before we start. Unlike other workshops, because of the non deterministic nature of these tools, there is no guarantee that the output will be the same as what your peers will see. What that means is that if you are working in groups, you can all expect different outputs. We have provided a [sample repo](https://github.com/094459/ada-python-demo-app) that you can use as a baseline, but we encourage you to explore and work with your own experiments - this is the most effective way of learning how these tools work.
  
 The workshop is split into a number of different labs, with some lectures as well. This is what we will cover
 
@@ -34,12 +34,19 @@ You will need VScode IDE (or as an alternative, IntelliJ) with the following VSC
 * Python 3.10 or newer
 * git
 
-(Optionally)
+You will access to a Postgres database. At the end of this lab, there are instructions on how you can run a local Postgres database using Docker or Finch.
 
-* Docker | Finch - we will be connecting to a local Postgres database, which we will be running in a container
+**Getting your environment ready**
 
+Once you have read the pre-req's, it is time to start up VSCode.
 
-We will be using files in the following GitHub repo, [ada-python-demo-app](https://github.com/094459/ada-python-demo-app)
+We will be using files in the following GitHub repo, [ada-python-demo-app](https://github.com/094459/ada-python-demo-app). The repo has a number of different branches which have been used to checkpoint the code at different stages. This will make it easy for you to follow along. For those unfamiliar with git, we will use the following syntax
+
+```
+git checkout <branch name>
+```
+
+This will change the files open in your VSCode, so do not be alarmed if they change - it will most likely be the branch you are in. You can explore the branches via the GitHub gui, or via the cli by typing "git branch -a".
 
 On your laptop, find a working directoy you want to use for this lab. From VScode, open up a new Terminal window, and from command prompt run the following to start our database.
 
@@ -220,14 +227,6 @@ Ok, you are now up to speed with the Amazon Q Developer plugin, and it is time t
 ## Building and Exploring a new application (25 min)
 
 In this lab we are going to use a very simple use case - we want to create a application in Python that will allow us to save and the use urls. We have chosen Python as it makes it easy to follow along and understand how these next generation developer tools work. So our URL shortner application will initially have some basic functionality, an MLP - Minimum Lovable Product.The github repo shared at the beginning of this document provides the all the code we will need. We will be using Amazon Q Developer to help us add more code and improve the basic functionality.
-
-The repo has a number of different branches which have been used to checkpoint the code at different stages. This will make it easy for you to follow along. For those unfamiliar with git, we will use the following syntax
-
-```
-git checkout <branch name>
-```
-
-This will change the files open in your VSCode, so do not be alarmed if they change - it will most likely be the branch you are in.
 
 We are going to start with the basic application that has been generated using Amazon Q Developer (see the note next to see how this was created). For the purpose of time we are not going to re-create this, but you can have a go once the labs have been completed, to see how you get on.
 
