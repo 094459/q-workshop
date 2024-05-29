@@ -379,7 +379,7 @@ You can see the output it generates here.
 
 ![Asking Amazon Q Developer for the index.html code](images/yoda-html.png)
 
-I add this code to the index.html, and save the file. When I now run this application, youy
+I add this code to the index.html, and save the file. When I now run this application, you will see the following when you open a browser window.
 
 ![Adding inspirational messages](images/yoda-motd.png)
 
