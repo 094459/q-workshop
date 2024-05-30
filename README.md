@@ -371,9 +371,13 @@ You will notice that this code is not actually complete. It leaves this open for
 
 ![Closing the function](images/yoda-close-braket.png)
 
-When I hit return, you will notice that Amazon Q Developer is not done suggesting stuff. It would like me to add a new route to this application (/) so that it can display a quote. We can hit TAB to accept that, we now have a new route.
+When I hit return, you will notice that Amazon Q Developer is not done suggesting stuff. You will notice more greyed out code that it wants you to add. In this case, we need to this to complete our function, so we hit TAB again. Once that code has been accepted, we hit return.
+
+Amazon Q Developer still isn't done. It would like me to add a new route to this application (/) so that it can display a quote. We can hit TAB to accept that, we now have a new route.
 
 ![New route added](images/yoda-add-route.png)
+
+> **When to stop!!** Sometimes when using tools like Amazon Q Developer, the suggestions might keep on going. You are in control, so you need to be intentional as to when you want to stop the suggestions happening. In this instance, now that we have our function, we can just hit return rather than TAB and that will stop further suggestions from coming.
 
 As it stands, if we run this code it will not work as there is no index.html within this application. We need to create this. From the templates folder, add a new file called "index.html".
 
@@ -401,6 +405,9 @@ I add this code to the index.html, and save the file. When I now run this applic
 > You will notice that files update in your local repo.
 >
 
+*Checking Amazon Q Developer logs*
+
+Before we complete this lab, from the VSCode tab OUTPUT select AMAZON Q LOGS from the pulldown. Take a few minutes to explore the output. You can see in more details how Amazon Q Developer is interacting with the backend model that is being served by Amazon Bedrock.
 
 Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
 
