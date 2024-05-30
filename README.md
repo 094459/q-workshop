@@ -84,6 +84,8 @@ If you are working through this in a group setting, then the person running the 
 
 To kick things off you will look at a quick overview of what we mean by generative AI developer tools. This will take a look at the typical use cases where developers can apply them, take a look at developer journeys in more detail, before finishing up with some tips as to how to use them effectively.
 
+![First slide of lecture](images/ppt-cover.png)
+
 This will set you up nicely for the practical hands on element, where we will actually do some of those use cases.
 
 # Setting up, and getting starting with Amazon Q Developer (20 min)
