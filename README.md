@@ -500,7 +500,7 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 The code you currently have might not be optimised. We can use Amazon Q Developer to help us optimise our code, and so we are going to now use it to improve our code by checking to make sure that we only provide valid URL's as well as not allowing us to submit duplicate URLs.
 
 ```
-> Update the code so that it checks for valid url's before saving
+Update the code so that it checks for valid url's before saving
 
 ```
 
@@ -535,7 +535,7 @@ Up until now we have been using a local file to store our short cuts. This is gr
 Using Amazon Q Developer Chat, we ask it
 
 ```
-can you update the app so that when a new url is added, it stores it in a postgres database. when creating the table we want to create columns for the url, the shortcut and a time stamp when this was created
+Can you update the app so that when a new url is added, it stores it in a postgres database. when creating the table we want to create columns for the url, the shortcut and a time stamp when this was created
 ```
 
 Review the code as before and update and make changes. You will need to do some additional things depending on the code suggestions made.
@@ -664,7 +664,7 @@ Once you have completed this lab, make sure you have removed any resources you d
 
 **Shutdown the Postgres database**
 
-Open the terminal session where you started Postgres and CTRL+C, and then run the following command when the command prompt returns
+If you created a local Postgres database, you need to shut this down. Open the terminal session where you started Postgres and CTRL+C, and then run the following command when the command prompt returns
 
 ```
 docker compose -p local-postgres -f postgres.yml down
@@ -681,19 +681,23 @@ Delete the working directory we created at the beginning of this lab, which cont
 
 If you want to remove the installed VScode plugins, from VSCode make sure you go to the Extensions icon bar on the left, and then select the plugin you want to uninstall. You should see an option to uninstall the plugin from each plugin. Sometimes they require a VSCode restart
 
+**Cloud based VSCode**
+
+If you spun up a VSCode instance on Amazon EC2, then follow the instructions (below) to delete the instance.
+
 ## Additional Activities
 
 **Additional Things to do**
 
-1. Add a home page, that displays a message and then provides links add and display shortcuts
+If you want to experiment more, then here are some additional activities you can try
+
+1. Add or change a home page, that displays a message and then provides links add and display shortcuts
 2. Select the code and look for optimistion opportunities within the code.
 3. Try and recreate this application in a different programming language
 4. Try creating the application from scratch using the /dev capabilitiy of Amazon Q Developer
-
-
+5. Explore how you can use Amazon Q Developer to help you understand how to deploy this application on AWS
 
 ## Creating supporting resources to run this lab
-
 
 To get the most from this lab, you will need to be running VSCode, and be able to install and run a few other components (Docker, VSCode Amazon Q Developer plugins, etc). If you are not able to do this, then what are your options? I have successfully run this lab using [GitPods](https://gitpod.io/workspaces) although I had to run a Postgres database separately (I used an Amazon RDS instance to do this). Alternatively you can spin up a VSCode environment on an EC2 instance.
 
@@ -706,6 +710,8 @@ If you have access to an AWS account, then you can use [the following Cloudforma
 This has all the developer tools you will need to run this lab, as well as experiment with other programming languages such as Java, Rust, .NET, and Node.
 
 I have been running this for a week, and the daily cost is around $1.50.
+
+*Cleaning up and removing your VSCode on EC2*
 
 After you have finished, make sure you clean up and delete all the resources. From the AWS CloudFormation console, select the stack and then use the DELETE STACK option to remove your VSCode on EC2 environment.
 
