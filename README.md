@@ -36,6 +36,8 @@ You will need VScode IDE (or as an alternative, IntelliJ) with the following VSC
 
 You will access to a Postgres database. At the end of this lab, there are instructions on how you can run a local Postgres database using Docker or Finch.
 
+The final lab will require you to have an AWS account, as we will be deploying the application we develop into AWS. You can still complete the previous labs without an AWS account, so if you do not have access to one, then miss this lab out.
+
 **Getting your environment ready**
 
 Once you have read the pre-req's, it is time to start up VSCode.
@@ -53,9 +55,8 @@ On your laptop, find a working directoy you want to use for this lab. From VScod
 Mac/Linux
 ```
 cd <your working directory>
-python -m venv ada-lab
-cd ada-lab
-source bin/activate
+python -m venv .venv
+source .venv/bin/activate
 git clone https://github.com/094459/ada-python-demo-app.git
 cd ada-python-demo-app
 ```
@@ -71,6 +72,24 @@ Use the Python VScode plugin to create a new Virtual environment (venv) using a 
 ```
  .\.venv\Scripts\activate
 ```
+
+VSCode Server
+
+If you are using the VSCode server running on EC2, your home directory will be /workshop. We need to create our virtual Python environment this way:
+
+```
+python -m venv ~/.venv
+source ~/.venv/bin/activate
+git clone https://github.com/094459/ada-python-demo-app.git
+cd ada-python-demo-app
+```
+
+If you are using VSCode running on EC2, I recommend using the inline browser that you can access from the link in the Ports tab. Whilst you can open a normal browser window, I found that it would often cache items. Feel free to experiment, and if you are seeing stale pages or updates not loading that you expect, try the inline browser and see if that changes. To access that, use the link as in the following screen shot.
+
+![how to launch the inline browser in VSCode server running on EC2](images/vscode-browser.png)
+
+> **Tip!** I have provided a CloudFormation tempalte that allows you to spin up VSCode running on EC2 in the [resources folder](resources/vscode-server.yaml)
+
 
 **How do follow along**
 
@@ -175,7 +194,7 @@ You can open the Chat Panel by clicking on the Amazon Q status bar link at the b
 
 ![Amazon Q Developer Chat interface](images/q-vscode-screen-layout.png)
 
-You can click on the + to open several chat sessions. When using Amazon Q Developer, the plugin will remember the conversations and use that in subsequent responses. This is very helpful when using Amazon Q to work through and troubleshoot issues. We will see this throughout this lab.
+You can click on the + to open several chat sessions. When using Amazon Q Developer, the plugin will remember the conversations and use that in subsequent responses. This is very helpful when using Amazon Q to work through and troubleshoot issues. We will see this throughout this lab. You can open up to ten of these different tabs or conversations.
 
 Amazon Q Developer also has some power features which are invoked using the /
 
@@ -203,10 +222,12 @@ During the lecture you will have heard about large language model context sizes.
 
 * When using the Amazon Q Developer inline code - when you are in the editor, latency and performance are critical, and so this affects the context size that Amazon Q Developer is able to use. It will take the prompt provided, as well as additional information within the file its working on 
 * When using the Amazon Q Developer chat interface - when you use the Amazon Q Developer chat, you will notice there is a small number just below the submit icon (4000/4000). This is the size of the context window. From a latency perspective, there is less need to be very responsive, and so this allows Amazon Q Developer to provide a bigger context size.
+* Amazon Q Developer chat inteface tabs - you can open up several chat interface tabs by clicking on the + next to the Chat. Each of these will be new conversations with new context. You can open up to ten of these chat conversations.
 
 Amazon Q Developer also uses things such as open tabs in VSCode, as well as key files depending on programming language (for example, the pom.xml in Java) to add additional information to help it make better suggestions.
 
 If you want to get low level and see this working, you can check the logging of the Amazon Q Developer plugin and see this in action.
+
 
 *Amazon Q Developer logs*
 
@@ -255,22 +276,32 @@ From VSCode, we should still have our Postgres database running in the Terminal 
 Mac
 ```
 cd <your working directory>
-cd ada-lab
-source bin/activate
+source .venv/bin/activate
 cd ada-python-demo-app
 ```
 Windows
 ```
 cd <your working directory>
-cd ada-lab
 .\venv\Scripts\activate
 cd ada-python-demo-app
 ```
 
+VSCode Server
+
+If you are using the VSCode server running on EC2, your home directory will be /workshop. We need to create our virtual Python environment this way:
+
+```
+python -m venv ~/.venv
+source ~/.venv/bin/activate
+cd ada-python-demo-app
+```
+
+
+
 If you check out your files and directories, you should see the following:
 
 ```
-ada-lab/
+/
 ├── ada-python-demo-app
     ├── app.py
     ├── finch
@@ -534,10 +565,73 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 Up until now we have been using a local file to store our short cuts. This is great for our local solution, but as we scale, we need to store this on something that can be accessed by many machines. A database is a good choice for this, so let us update our code to store all our shortcuts on a Postgres database.
 
+We have a local Postgres database up and running - if you have not done that yet, use the instructions provided to spin up a local Postgres database using Docker or Finch. This will create a local Postgre database with a user (postgres) and password (change-me).
+
+*Creating a database*
+
+The first thing we will do is create a database we can use, we will call it urldb. Lets see how Amazon Q Developer can guide us.
+
+```
+I have a local Postgres database running in a docker container. I want to create a new database called urldb. Provide a step by step guide on how to do this.
+```
+
+Review the output. It will most likely ask you to use a tool called "psql" but we do not have this installed on our environment. You know what I am going to say right? Lets ask Amazon Q Developer to help us simplify how to install this.
+
+```
+How do I install psql for my local database running Postgres 15.6. I am using Ubuntu.
+```
+
+You should see a difference in the level of detail and relevance to our setup. 
+
+> **Hint!** This is what Amazon Q Developer suggested for me which worked great
+> 
+> ```
+> sudo apt install wget ca-certificates
+> wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+> sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+> sudo apt update
+> sudo apt install postgresql-client-15
+> ```
+
+
+
+We should complete the steps outlined to install psql. Check to make sure you have it working by running the following:
+
+```
+psql --version
+```
+
+And you should get something like
+
+```
+psql (PostgreSQL) 15.7 (Ubuntu 15.7-1.pgdg22.04+1)
+```
+
+Now complete the previous steps that Amazon Q Developer (scroll up to the previous output in the Chat interface) to create your database.
+
+> **Hint!** When I ran this, this was the command I ran to create this new database
+>
+> ```
+> psql -U postgres -h 127.0.0.1
+> ```
+> Enter password
+>
+> postgres =#
+> postgres=# CREATE DATABASE urldb;
+> CREATE DATABASE
+> \l
+>  urldb     | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+> \q
+> ```
+
+We now have our new database.
+
+*Updating our application*
+
 Using Amazon Q Developer Chat, we ask it
 
 ```
-Can you update the app so that when a new url is added, it stores it in a postgres database. when creating the table we want to create columns for the url, the shortcut and a time stamp when this was created
+Can you update the app so that when a new url is added, it stores it in a postgres database called urldb. when creating the table we want to create columns for the url, the shortcut and a time stamp when this was created
 ```
 
 Review the code as before and update and make changes. You will need to do some additional things depending on the code suggestions made.
@@ -549,6 +643,7 @@ Review the code as before and update and make changes. You will need to do some 
 > When I try and install I get this error - Error: pg_config executable not found.
 
 * There is a hand VSCode plugin that allows you to connect to Postgres databases and easily view/modify the data - https://marketplace.visualstudio.com/items?itemName=cweijan.dbclient-jdbc
+
 
 One of the really helpful ways that developers are using tools like Amazon Q Developer is when working with SQL. Whilst the SQL code in our application is very simple, you can imagine how useful getting help on more complex queries will be. In our code, lets update the code so that we list all short cuts by date order. We can use a prompt like this:
 
@@ -660,6 +755,255 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 ---
 
+## Deploying our application (90 min) 
+
+*currently work in progress*
+
+For this lab, you will need to have access to an AWS account, and have enough privileges to create, deploy, and then delete resources. In this lab we are going to use Amazon Q Developer to help us understand how we can deploy this application on AWS, and then ask it to help guide us through each of the steps. By the end of this, we should have our simple application up and running in the Cloud.
+
+**Lab 03-1 Deployment options**
+
+We want to deploy this application on AWS, and we want to do that via containers. Amazon Q Developer can help us narrow down and select the right AWS service to help you. Let's ask it some questions about our application, and the container deployment options it thinks are well suited.
+
+```
+I want to deploy this application on a container solution. What are these best container deployment options on AWS, for this application?
+```
+
+Review the output. Is this helpful? Did you try some follow up questions/prompts?
+
+```
+Which of these is the simplest to get started with?
+How do I get started with this?
+```
+
+The output of this is likely to suggest (remember, non determinsitic tools will always vary in their output) that AWS Fargate and Amazon ECS as the likely best deployment option. This does seem like a good selection, so we will proceed on the basis of wanting to deploy our application on Amazon ECS.
+
+**Complete:** You can proceed to the next lab.
+
+---
+
+**Lab 03-2 Migrating our database**
+
+We have been running our Postgres database locally, which was fine as we developed our application. We now need to think about how to move the database portion. Lets see how we can get Amazon Q Developer to help us.
+
+```
+What are the best options for deploying this Postgres 15.6 database on AWS?
+```
+
+Explore the output. You will likely be offered a number of options. Ask follow up questions to help you get clearer answers.
+
+```
+Which is the best options for this application?
+```
+
+You can also ask specific questions based on your non functional requirements. For example, if performance, or scale, or cost is your biggest concern, refine your prompts to help you get more specific information. Use the interactive chat approach to ask follow up questions to provide more specific informtion. Try some of the following to see what you get.
+
+```
+If cost is my most important consideration, what is the best option?
+I only want to spin up a test postgres database, which option should I go with?
+```
+
+We are going to proceed on the basis of using Amazon RDS Postgres for our database. Now that we now what we want, we need to get some help from Amazon Q Developer to guide us through this. Using the output of the first stage (the decision to deploy our application on Amazon ECS) we might craft a prompt that looks like the followiing
+
+```
+This is a completely new setup, assume I do not have any existing resources set up. Provide a step by step guide on how I can setup a single Amazon RDS PostgreSQL database server.
+```
+
+Review the output - you should find that Amazon Q Developer has provided a nice checklist of things you need to do to get this application up and running.
+
+> **Tip!** You can ask follow up questions, perhaps you liked the checklist but you want more specific details about one of the points, or maybe you are not sure how to do another. This is the great thing about the interactive chat interaction with Amazon Q Developer - as it remembers the previous responses, it proivdes more contextualised answers based on the sum of the questions and answers that have come before.
+
+One follow up question I typically ask is the following:
+
+```
+Can you show me a cloudformation template that provisions this in the eu-west-2 region for me.
+```
+
+> **Tip!** It is helpful to provide as much information as possible when asking Amazon Q Developer to provide code suggestions. In this instance, it might not know that I want to deploy this in the London region, so I need to provide that additional context for it.
+
+Review the output. If it is anything like mine, you should get a detailed Cloudformation teplate, which we can paste into a new file.
+
+From your IDE, create a new file called "rds-deployment.yaml" and paste the contents of the code into this file.
+
+Before we use it, open it up in your IDE and make sure that the VPC details match the AWS Region you are going to deploy it into. The file in the GitHub repo is current set to eu-west-2 (London) but you might be running this from a different region.
+
+From the AWS CloudFormation console, now create a new stack (making sure you check your AWS region) using this cloudformation template (using the "Upload a template file" option).
+
+You might encounter errors when deploying this template. If you do, use Amazon Q to help you troubleshoot. When I did this the first time, I was able to use Amazon Q Developer to help me remove a line that was deprecated and no longer needed.
+
+
+Once this has completed, how can we test this out. One of the simplest ways we can connect to our RDS Postgres database is use AWS Cloudshell. This will open up a terminal that already has psql installed and ready to go.
+
+```
+I am using AWS Cloudshell. Tell me how do I connect to my RDS Postgres database.
+```
+
+
+When you do this, you are likely to get an error. This makes sense - we provisioned our Amazon RDS Postgres database, but we did not configure inbound access at the network level. We need to allow inbound access to our Cloudshell terminal. We can ask Amazon Q Developer to help with this task.
+
+```
+How do I enable inbound access to my RDS postgres database
+```
+
+As you review the output and go through the steps, you will need to provide our external IP address. If you do not know this, (or even if you do) ask Amazon Q Developer to show you how to do this.
+
+```
+How do i find my external IP via the command line
+```
+
+> **Good to know!** You will get a number of options. The one I liked the best (and was new to me, so hurrah I learned something new) was to run:
+> 
+> ```
+> wget -qO- ipinfo.io/ip
+> ```
+> Which provided my external IP.
+>
+
+
+Amend the database security group to add the new inbound rule that will allow your Cloudshell to access your database. Try and access your database again, this time should be prompted to enter your password.
+
+> **Hint** This is the command I used (change the hostname for your RDS postgres hostname)
+>
+> ```
+> psql --host={hostname} --port=5432 --username=postgres --dbname=urldb
+>```
+>
+
+
+(Optional Task - Exporting and Importing existing data)
+
+You will already have some data in your local Postgres database, and perhaps you might want to move this data to the new Amazon RDS Postgres database you have setup. There are many options available, so lets see if Amazon Q Developer can help us with this task.
+
+```
+What is the simplest way of migrating data from my local Postgres database running in a local docker container, to my Amazon RDS instance running ?
+```
+
+You should get some useful information. It looks like we need to use a tool called pg_dump, to export the local data and then use the same tool to import into Amazon RDS Postgres. This tool is not installed on our environment, so we can ask Amazon Q on how to do that
+
+```
+How do I install pg_dump on my local machine
+```
+
+Review the output, but do **not** run the commands yet. When using tools like Amazon Q Developer, it is really important to put as much detail and context into the request. If you do not, you might likely get output that is correct, but perhaps for not your specific setup. I am redo this prompt to improve the liklihood of good outputs.
+
+```
+How do I install pg_dump for my local database running Postgres 15.6. I am using Ubuntu.
+```
+
+You should see a difference in the level of detail and relevance to our setup. We should complete the steps outlined to install pg_dump.
+
+
+Check to make sure you have it working by running the following:
+
+```
+pg_dump --version
+```
+
+And you should get something like
+
+```
+pg_dump (PostgreSQL) 15.7 (Ubuntu 15.7-1.pgdg22.04+1)
+```
+
+> **Hint!** You should be guided by Amazon Q Developer to run a command that will export your database. This is the command that it provided me.
+>
+> ```
+> pg_dump -U postgres -d urldb -h 127.0.0.1 -p 5432 -F c > backup.sql
+> ```
+> 
+> Which generated an export file in my local directory,
+
+You should now have a pg_dump export on your local VSCode development machine. We now need to import this into our Amazon RDS Postgres database.
+
+We have already configured the access to our RDS Postgres database via Cloudshell, so we will use that environment to do the import.
+
+Open up a Cloudshell environment, and make sure you are in the same AWS region as your database. From the ACTION menu (top right) you can select UPLOAD FILE and then select your Postgres backup  file (in my example, this was backup.sql). It is a small file and so will not take any time at all.
+
+Now from the Cloudshell environemnt, we can now import our data. As this is a new Postgres environment, we first have to create our database. We can use the same approach as we did when we created it locally, just changing the {hostname}
+
+```
+psql -U postgres -h {hostname}
+```
+
+> **Hint!** The {hostname} is the fully qualified DNS name of your Amazon RDS Postgres database, not IP. In my example, it was "qlabrdsdb-rdsdatabase-07oxzbaciljh.ceinbxvexcbx.eu-west-1.rds.amazonaws.com"
+
+
+After entering the password, create your "urldb" database and exit.
+
+Depending on what Amazon Q Developer has guided you, we now need to restore from our backup. Lets ask Amazon Q Developer how to do this.
+
+```
+How do I restore a pg_dump backup. I am running Postgres 15.6 on Ubuntu.
+```
+
+Review the output, and try running the command. You should now have your old data in the new database.
+
+> **Hint!** This is the command I ran. Notice here how I put the hostname in " " - I needed to do this as pg_restore generated an error when I left them out.
+>
+> ```
+> pg_restore -U postgres -h "{hostname}" -d urldb backup.sql
+> 
+> ```
+
+We can now check and see if our data is all good by connecting in Cloudshell via psql and running the follwoing query
+
+```
+> psql -U postgres -h {hostname} -d urldb
+
+urldb=> select * from shortcuts;
+ id | shortcut |           url            |         created_at         
+----+----------+--------------------------+----------------------------
+  1 | 0hBXEm   | http://www.bbc.co.uk     | 2024-06-04 11:01:22.852552
+  2 | NqAo9I   | https://www.amazon.co.uk | 2024-06-04 11:01:25.286275
+(2 rows)
+```
+
+Looks good, you have now finished this optional lab.
+
+-
+
+Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+
+**Complete:** When you have setup the RDS Postgres database for this project, you can proceed to the next lab.
+
+----
+
+**Lab 03-2 Containerising our application**
+
+
+Building our container
+
+Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+
+**Complete:** When you have containerised our application, you can proceed to the next lab.
+
+----
+
+**Lab 03-3 Configuring and Deploying our application to Amazon ECS**
+
+
+Deploying to Amazon ECS
+
+
+
+Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+
+**Complete:** When you have deployed your application, you can proceed to the next lab.
+
+
+
+---
+
+**Lab 03-4 Creating infrastructure as code**
+
+Creating infrastructure as code
+
+
+
+Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+
+**Complete:** Congratulations, you have completed all the labs. Remember to remove, delete, and clean up all the resources you created if you are running this in your own AWS environment. If you are doing this within a Workshop Studio environment, you are good to go.
+
 ## Finish and Clean up
 
 Once you have completed this lab, make sure you have removed any resources you do not want to keep by following these instructions
@@ -683,9 +1027,16 @@ Delete the working directory we created at the beginning of this lab, which cont
 
 If you want to remove the installed VScode plugins, from VSCode make sure you go to the Extensions icon bar on the left, and then select the plugin you want to uninstall. You should see an option to uninstall the plugin from each plugin. Sometimes they require a VSCode restart
 
-**Cloud based VSCode**
+**Remove your Cloud based VSCode**
 
 If you spun up a VSCode instance on Amazon EC2, then follow the instructions (below) to delete the instance.
+
+**Remove AWS resources**
+
+If you did optional lab of deploying the application to AWS, then you will need to remove the resources created. As we used AWS CDK to deploy our application to AWS, then we can use this to clean up all the resources using the "cdk destroy {stack}" command.
+
+You will also need to delete the container images and the image repository created in Amazon ECR.
+
 
 ## Additional Activities
 
@@ -763,7 +1114,7 @@ INFO[0000] Attaching to logs
 psql-1 |
 psql-1 |PostgreSQL Database directory appears to contain a database; Skipping initialization
 psql-1 |
-psql-1 |2024-05-15 16:18:45.413 UTC [1] LOG:  starting PostgreSQL 16.2 (Debian 16.2-1.pgdg120+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+psql-1 |2024-05-15 16:18:45.413 UTC [1] LOG:  starting PostgreSQL 15.6 (Debian 15.6-1.pgdg120+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
 psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
 psql-1 |2024-05-15 16:18:45.414 UTC [1] LOG:  listening on IPv6 address "::", port 5432
 psql-1 |2024-05-15 16:18:45.416 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
