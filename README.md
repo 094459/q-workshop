@@ -21,6 +21,8 @@ The workshop is split into a number of different labs, with some lectures as wel
 * Adding Tests
 * Documenting our application
 
+There is an additional lab that looks at how to deploy your completed application onto AWS.
+
 ---
 
 **What you will need**
