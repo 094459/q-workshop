@@ -751,13 +751,32 @@ Review the output for each of these prompts and then make changes. As these file
 
 Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
 
-**Complete:** When you have this project to now be open source, you can proceed to the next lab.
+**Complete:** Congratulations, you have completed this hands on lab. If you have time, there are some additional ideas for activities for you to do. Otherwise, go and congratulate yourself with a well earned beverage of your choice!
 
 ---
 
-## Deploying our application (90 min) 
+**Additional Things to do**
 
-*currently work in progress*
+If you want to experiment more, then here are some additional activities you can try. Use Amazon Q Developer to guide you to doing these, using all the skills you have picked up so far.
+
+1. Add or change a home page, that displays a message and then provides links add and display shortcuts
+
+> **Hint!** You can try using Amazon Q Developer inline to do this
+
+2. Select the code and look for optimistion opportunities within the code.
+
+> **Hint!** There are a number of ways you can optimise the code, so first use Amazon Q Developer Optimise, and take it from there
+
+3. Try and recreate this application in a different programming language
+
+> **Hint!** Choose a programming language you are familiar with and where you have everything already available on your developer machine. Reproducing this in Node or Java works well, but you should be able to use other programming languages too
+
+4. Explore how you can use Amazon Q Developer to help you understand how to deploy this application on AWS
+
+> **Hint!** Select blocks of code and see whether you think the explaination makes sense.
+
+
+## Deploying our application (90 min) 
 
 For this lab, you will need to have access to an AWS account, and have enough privileges to create, deploy, and then delete resources. In this lab we are going to use Amazon Q Developer to help us understand how we can deploy this application on AWS, and then ask it to help guide us through each of the steps. By the end of this, we should have our simple application up and running in the Cloud.
 
@@ -777,6 +796,26 @@ How do I get started with this?
 ```
 
 The output of this is likely to suggest (remember, non determinsitic tools will always vary in their output) that AWS Fargate and Amazon ECS as the likely best deployment option. This does seem like a good selection, so we will proceed on the basis of wanting to deploy our application on Amazon ECS.
+
+The next step is to ask Amazon Q Developer how our application might need to change when deploying to Amazon ECS. I try the following prompt
+
+```
+Update this application so that it will run on Amazon ECS
+```
+
+Review your output. When I ran this, it provided some general changes that would be needed whether I was deploying this to Amazon ECS or another compute environment.
+
+> **Hint!** The output I got asked to change two things. 1/ Remove the "if __name__ == '__main__':" code block as this is using the Flask development server and not ideal for running on a server, and 2/ create an entrypoint script and use something like Gunicorn WSGI server to start the application. This is what my script looked like
+>
+> ```
+> #!/bin/sh
+> # Start the WSGI server
+> gunicorn --bind 0.0.0.0:5000 app:app
+> ```
+>
+> I now start my application using ./entrypoint.sh (change to .bat if you are using Windows)
+
+Make the necessary changes to make your application ready for its server life.
 
 **Complete:** You can proceed to the next lab.
 
@@ -970,10 +1009,100 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 **Lab 03-2 Containerising our application**
 
+We have our database migrated, now lets do the same thing for our application. In the first lab we explored the guide of guidance and advice that tools like Amazon Q Developer can provide us. We used the Amazon Q Developer Chat interface, and we decided that we were going to deploy this on Amazon ECS. The first step in doing that is building our container locally, and then pushing that to a container registery, which in our case will be Amazon ECR.
 
-Building our container
+> **Amazon Q Developer in the AWS Console** Did you know you can also use Amazon Q within the AWS console? I sometimes find it useful to run the same prompt across both to compare the output. It uses a model that is trained on over 17 years of AWS data. Whilst the model is hosted on Amazon Bedrock, it is different to the one used for the Amazon Q Developer in the IDE. You do need to have an AWS account and for your user to be enabled.
 
-Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+Lets start by asking how to build a container image for our application.
+
+```
+What are the steps I need to follow to building a container image of this application
+```
+
+Review the output - if yours is anything like mine, it should provide a good starting point for what we need to do. 1. Create a requirements.txt file for our Python dependencies, 2. Create a Dockerfile, 3. Build and package our container image, and finally 4. Configure environment variables. We will ask Amazon Q Developer to help us with each of these. 
+
+The first one is easy, how to create a requirements.txt file. As Amazon Q Developer, and it should provide a response that includes "pip freeze > requirements.txt". After it has been created, review the file. 
+
+The next step is to create our Docker file. So lets ask Amazon Q Developer to help us.
+
+```
+Create a docker file for this application
+```
+
+Review the output. It should look pretty good. If we try and build this as is, it will fail. Why? I can hear you all say. One of the Python libraries we are installing (psycopg2) has a dependency on the underlying Postgres client libraries, so we need to install that as part of the Docker file. No worries, lets ask Amazon Q Developer to help us. 
+
+```
+Create a docker file for this application. Include dependencies required by the psycopg2 library, and make sure it runs in a Python virtual environment
+```
+
+When you look at the new recomendations from Amazon Q Developer, you will see that it installs libpq-dev which is what we need. We can now build our container image.
+
+```
+sudo docker build -t ada-q-lab .
+[+] Building 19.4s (14/14) FINISHED                                                                                                    docker:default
+ => [internal] load build definition from Dockerfile                                                                                             0.0s
+ => => transferring dockerfile: 851B                                                                                                             0.0s
+ => [internal] load metadata for docker.io/library/python:3.9-slim                                                                               0.5s
+ => [internal] load .dockerignore                                                                                                                0.0s
+ => => transferring context: 2B                                                                                                                  0.0s
+ => CACHED [build 1/5] FROM docker.io/library/python:3.9-slim@sha256:088d9217202188598aac37f8db0929345e124a82134ac66b8bb50ee9750b045b            0.0s
+ => [internal] load build context                                                                                                                0.0s
+ => => transferring context: 37B                                                                                                                 0.0s
+ => [build 2/5] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential     libpq-dev     && rm -rf /var/lib/apt/  10.6s
+ => [stage-1 2/5] RUN useradd --create-home appuser                                                                                              0.3s
+ => [stage-1 3/5] WORKDIR /app                                                                                                                   0.0s
+ => [build 3/5] WORKDIR /app                                                                                                                     0.0s 
+ => [build 4/5] COPY requirements.txt .                                                                                                          0.0s 
+ => [build 5/5] RUN pip install --no-cache-dir -r requirements.txt                                                                               7.7s 
+ => [stage-1 4/5] COPY --from=build /app /app                                                                                                    0.0s 
+ => [stage-1 5/5] RUN chown -R appuser:appuser /app                                                                                              0.2s 
+ => exporting to image                                                                                                                           0.1s 
+ => => exporting layers                                                                                                                          0.1s 
+ => => writing image sha256:cf81852e621ab3e451ac1dc4248091962fe67877b754a608350518c9306ac966                                                     0.0s 
+ => => naming to docker.io/library/ada-q-lab    
+```
+
+> **Hint!** You can find the Dockerfile created [here](resources/Dockerfile)
+
+
+Now that we have our application containerised, lets make sure it works. As we are going to be running our application in a Docker container, we need to change the local host to the IP of your machine. This will vary based on where you are running this workshop. If you are running this on your local machine, you will need to use the reserved hostname "host.docker.internal". If you are running this from VSCode on EC2, you will need to find the private IP address of the instance. The easiest way to do this is to find the EC2 instance via the CloudFormation template, and then from the EC2 console, find the private IP address from the instance details.
+
+```
+docker run -p 5000:5000 -e DB_HOST=127.0.0.1 | host.docker.internal -e DB_NAME=urldb -e DB_USER=postgres -e DB_PASSWORD=change-me -e SECRET_KEY=your_secret_key ada-q-lab
+
+```
+
+> **Note!** We are only testing to make sure the app comes up, so you should see the home page when you open the browser. 
+
+When we were using the Flask dev server, we could exit the application by hitting CTRL + C. You can try this, and it might work depending on where you are running this. The other way is to send a QUIT signal to the gunicorn process. We do that by running the following command.
+
+```
+ps -ef | grep gunicorn | awk '{print $2}' | xargs sudo kill -QUIT 
+```
+
+Which should shut it down.
+
+
+Now that we have a container image of our application, we need to store it into a container registery, so lets ask Amazon Q Developer to remind us how that goes again.
+
+```
+I want to push this container image to a container registry. Provide a step by step guide, including creating the registry.
+```
+
+Review the steps, these should be pretty straight forward to complete. Call your Amazon ECR repository "url-app". You can find the AWS Account Number and AWS Region from environment variables (echo $AWS_ACCOUNTID && echo $AWS_REGION)
+
+> **Hint!** These are the command I ran - yours will be different as they will have different AWS Account IDs and possibly different AWS regions.
+>
+> ```
+> aws ecr get-login-password --region eu-west-1 | sudo docker login --username AWS --password-stdin xxxxx.dkr.ecr.eu-west-1.amazonaws.com
+> sudo docker tag ada-q-lab xxxxxx.dkr.ecr.eu-west-1.amazonaws.com/url-app:1.0.0
+> sudo docker push xxxxx.dkr.ecr.eu-west-1.amazonaws.com/url-app:1.0.0
+> ```
+>
+
+If you go back to the Amazon ECR console, you should now see you have your application's container image there, with a tag set to 1.0.0. Open up the image, you will notice that the container image has a URI. We will need to use this later on, so make sure you find it before proceeding.
+
+That is this part complete. Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
 
 **Complete:** When you have containerised our application, you can proceed to the next lab.
 
@@ -981,28 +1110,76 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 **Lab 03-3 Configuring and Deploying our application to Amazon ECS**
 
+Now that we have a container image we can use, the next step is to create the execution environment for our container. We are going to be using Amazon ECS to do this. We need to connect this to our Amazon RDS Postgres database, so lets ask Amazon Q Developer what we need to do.
 
-Deploying to Amazon ECS
+```
+I want a step by step guide on how to run this container application on Amazon ECR in Amazon ECS. I need to connect to my Amazon RDS Postgres database, which I configure by exposing environment variables (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, and SECRET_KEY)
+```
 
+Take a look at the output and follow through the instructions. Is it helpful and does it make sense?
 
+As a good developer, we are always looking to automate our tasks. Lets see if we can ask a follow on question, and ask Amazon Q Developer to help create a CloudFormation template for us.
 
-Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+```
+Create a CloudFormation template that does this for me. Make sure that it creates 1. a way for this application to be accsedd from the internet. 2. configures access so that the ECS cluster can access the RDS Postgres database.
+```
 
-**Complete:** When you have deployed your application, you can proceed to the next lab.
+If you are not very confident or familiar with CloudFormation templates, you might need to proceed carefully. You can use Amazon Q Developer to help explain or add/change things you feel are not quite right, or missing.
 
+I also followed up with additional improvements as I noticed some of the things I asked were not created.
 
+```
+Can you update this template so that it asks for the RDS Security Group.
+Update the template to include ingress from the ECS cluster to the RDS database
+Can you update it so that it creates logs in Cloudwatch
+Change the health check from / to /add
+```
 
----
+Review your output. [Here](resources/ecs-deployment.yaml) is the one that it created for me. Compare how they are different or similar. Use this one to do your deployment
 
-**Lab 03-4 Creating infrastructure as code**
+You are going to need to grab a lot of information from previous steps in order to deploy the application to Amazon ECS. You are going to need:
 
-Creating infrastructure as code
+* AppImageURI is the link to your container image. This is the URI that you looked at in Amazon ECR.
+* The hostname of your Amazon RDS Postgres database (in my example, this was qlabrdsdb-rdsdatabase-07oxzbaciljh.ceinb9vexcbc.eu-west-1.rds.amazonaws.com)
+* The name of your user - this will be "postgres"
+* The name of your database - this will be "urldb"
+* The password - this will be "change-me"
+* The Secret Key - you can enter any string, I used "secret"
+* The VPC ID - select the VPC that your Amazon RDS database is using. You can get this from the Amazon RDS console
+* The Subnet IDs - select the two public subnets from the same VPC. You can get this from the Amazon RDS console
+* RDSSecurityGroup - select the security group which will be modified to allow ingress traffic from this ECS cluster
 
+The deployment will take several minutes, so perfect time for a break.
 
+After about 10 minutes, the deployment should complete. Check the "Output" tab for the CloudFormation stack, where you will find the external DNS for your url shorterning application. You can try and access it, and try it out. It should work exactly as on your local setup.
 
-Before proceeding to the next lab, shut down the application by using CTRL + C and returning to the command prompt.
+Explore what has been created. Check out the Amazon ECS console, and look at the service and tasks that are running. You can view the Logs and it should look familiar.
+
+> **Hint!** If you are struggling, the completed code that Amazon Q Developer generated for me can be found at the ecs branch of the repo, which you can access by
+>
+> ```
+> git checkout ecs
+> ```
+
+You can make changes to your application. Once you have made changes, you will need to:
+
+* re-build your local container image, with a different tag
+* push the updated container image to the Amazon ECR container repo
+* update the CloudFormation tempalte to use a new URI for the container image
+
 
 **Complete:** Congratulations, you have completed all the labs. Remember to remove, delete, and clean up all the resources you created if you are running this in your own AWS environment. If you are doing this within a Workshop Studio environment, you are good to go.
+
+
+**Additional activities**
+
+If you want to explore this lab more, here are some ideas that you can look to partner with Amazon Q Developer to work through.
+
+1. Instead of using environment variables to manage connection details to your Amazon RDS Postgres database, use AWS Secrets Manager
+2. 
+
+
+
 
 ## Finish and Clean up
 
@@ -1023,13 +1200,9 @@ You can additional delete any container images that were downloaded
 
 Delete the working directory we created at the beginning of this lab, which contains all the files we worked on.
 
-**Remove VSCode plugins**
-
-If you want to remove the installed VScode plugins, from VSCode make sure you go to the Extensions icon bar on the left, and then select the plugin you want to uninstall. You should see an option to uninstall the plugin from each plugin. Sometimes they require a VSCode restart
-
 **Remove your Cloud based VSCode**
 
-If you spun up a VSCode instance on Amazon EC2, then follow the instructions (below) to delete the instance.
+If you spun up a VSCode instance on Amazon EC2, then follow the instructions (below, in the "Creating supporting resources to run this lab" section) to delete the instance.
 
 **Remove AWS resources**
 
@@ -1038,17 +1211,6 @@ If you did optional lab of deploying the application to AWS, then you will need 
 You will also need to delete the container images and the image repository created in Amazon ECR.
 
 
-## Additional Activities
-
-**Additional Things to do**
-
-If you want to experiment more, then here are some additional activities you can try
-
-1. Add or change a home page, that displays a message and then provides links add and display shortcuts
-2. Select the code and look for optimistion opportunities within the code.
-3. Try and recreate this application in a different programming language
-4. Try creating the application from scratch using the /dev capabilitiy of Amazon Q Developer
-5. Explore how you can use Amazon Q Developer to help you understand how to deploy this application on AWS
 
 ## Creating supporting resources to run this lab
 
@@ -1146,6 +1308,8 @@ Leave this up and running in a command window as we will need to connect to this
 >```
 >Which will return you back to the command line.
 >
+
+*Additional tools for VSCode*
 
 In addition, you may find the following VSCode plugin useful for connecting to local databases. With the trial/free version, it allows you to connect to three databases.
 
