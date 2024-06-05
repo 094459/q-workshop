@@ -1009,7 +1009,7 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 ----
 
-**Lab 03-2 Containerising our application**
+**Lab 03-3 Containerising our application**
 
 We have our database migrated, now lets do the same thing for our application. In the first lab we explored the guide of guidance and advice that tools like Amazon Q Developer can provide us. We used the Amazon Q Developer Chat interface, and we decided that we were going to deploy this on Amazon ECS. The first step in doing that is building our container locally, and then pushing that to a container registery, which in our case will be Amazon ECR.
 
@@ -1110,7 +1110,7 @@ That is this part complete. Before proceeding to the next lab, shut down the app
 
 ----
 
-**Lab 03-3 Configuring and Deploying our application to Amazon ECS**
+**Lab 03-4 Configuring and Deploying our application to Amazon ECS**
 
 Now that we have a container image we can use, the next step is to create the execution environment for our container. We are going to be using Amazon ECS to do this. We need to connect this to our Amazon RDS Postgres database, so lets ask Amazon Q Developer what we need to do.
 
@@ -1178,9 +1178,9 @@ You can make changes to your application. Once you have made changes, you will n
 If you want to explore this lab more, here are some ideas that you can look to partner with Amazon Q Developer to work through.
 
 1. Instead of using environment variables to manage connection details to your Amazon RDS Postgres database, use AWS Secrets Manager
-2. 
-
-
+2. Implement a simple CI/CD system that allows you to automate the process of making changes to your code
+3. Add a new feature to your application that exports all the url's it has saved
+4. Add OpenTelemetry support for this application, and then explore some of the traces and spans from within the AWS console.
 
 
 ## Finish and Clean up
