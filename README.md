@@ -21,7 +21,7 @@ The workshop is split into a number of different labs, with some lectures as wel
 * Adding Tests
 * Documenting our application
 
-There is an additional lab that looks at how to deploy your completed application onto AWS.
+There is an additional lab that looks at how to deploy your completed application onto AWS. These will incur additional costs for your AWS environment. Whilst testing this workshop, the additional costs were about $10 for the day (it was actually around $7.40). Please ensure you clean up and remove all resources once you have completed the labs.
 
 ---
 
@@ -1221,6 +1221,7 @@ To get the most from this lab, you will need to be running VSCode, and be able t
 **Setting up VSCode on EC2**
 
 If you have access to an AWS account, then you can use [the following Cloudformation template](https://aws-oss.beachgeek.co.uk/3xa) to deploy VSCode server on an EC2 instance. After downloading this gist locally, log into the AWS account you want to use. From the AWS CloudFormation console, go to CREATE NEW STACK, and then use the UPLOAD A TEMPLATE FILE option, selecting the downloaded template. You can accept the defaults (you will need to give it a name), and deployment will only take 5-10 minutes. Once deployed, from the OUTPUTs tab, you will see two things you need to access your new VSCode cloud desktop - a URL link to it, and a password. Click on the link, and then enter the password and you should then be presented with VSCode.
+
 
 ![Running VSCode in EC2](/images/ada-q-ec2-vscode.png)
 
