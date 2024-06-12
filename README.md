@@ -452,7 +452,17 @@ Before proceeding to the next lab, shut down the application by using CTRL + C a
 
 **Lab 01-4 Security Scan**
 
-When we were exploring some of the capabilities that Amazon Q Developer provides, performing Security Scans was one of these. Using the Amazon Q menu options, kick off a Security Scan.
+When we were exploring some of the capabilities that Amazon Q Developer provides, performing Security Scans was one of these. We will explore how that works in this lab. First though, we need to generate something that I hope all of you will never do - add sensitive information in your applications.
+
+In the IDE, in your code add the following line in your code. In my example, I added this in line 6, between the app=Flask() and the url_mapping..
+
+```
+password = "secret"
+```
+
+Save the file.
+
+Using the Amazon Q menu options, kick off a Security Scan.
 
 Whilst that is running, from the OUTPUT tab, look at the Amazon Q Logs and Amazon Q Security Scan Log. This is where the output from running these scans is generated.
 
