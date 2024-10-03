@@ -14,7 +14,7 @@ The workshop is split into a number of different labs, with some lectures as wel
 
 * Introduction to next generation developer tools
 * Setting up, and getting starting with Amazon Q Developer
-* Building our URL Shortener application
+* Building a sample application
 * Fixing and improving our application
 * Adding new features
 * Running Security scans
@@ -34,63 +34,11 @@ You will need VScode IDE (or as an alternative, IntelliJ) with the following VSC
 * PostgreSQL cli tools - "brew install postgresql" (Mac) , use the windows installer to just install the cli tools (windows), or "sudo apt get install libpq-dev" (Ubuntu),"sudo dnf install libpq-devel" (Fedora)
 * Python 3.10 or newer
 * git
+* Docker or Finch - we will be spinning up local containers via a Docker Compose file, so you will need something like Docker or Finch to be able to run these. If you are not familiar with this, there are instructions on how you can run a local Postgres database using Docker or Finch in the Reference/Appendix section at the end of this workshop document.
 
-You will access to a Postgres database. At the end of this lab, there are instructions on how you can run a local Postgres database using Docker or Finch.
+**Optional**
 
-The final lab will require you to have an AWS account, as we will be deploying the application we develop into AWS. You can still complete the previous labs without an AWS account, so if you do not have access to one, then miss this lab out.
-
-**Getting your environment ready**
-
-Once you have read the pre-req's, it is time to start up VSCode.
-
-We will be using files in the following GitHub repo, [ada-python-demo-app](https://github.com/094459/ada-python-demo-app). The repo has a number of different branches which have been used to checkpoint the code at different stages. This will make it easy for you to follow along. For those unfamiliar with git, we will use the following syntax
-
-```
-git checkout <branch name>
-```
-
-This will change the files open in your VSCode, so do not be alarmed if they change - it will most likely be the branch you are in. You can explore the branches via the GitHub gui, or via the cli by typing "git branch -a".
-
-On your laptop, find a working directoy you want to use for this lab. From VScode, open up a new Terminal window, and from command prompt run the following to start our database.
-
-Mac/Linux
-```
-cd <your working directory>
-python -m venv .venv
-source .venv/bin/activate
-git clone https://github.com/094459/ada-python-demo-app.git
-cd ada-python-demo-app
-```
-Windows
-```
-cd <your working directory>
-git clone https://github.com/094459/ada-python-demo-app.git
-cd ada-python-demo-app
-```
-
-Use the Python VScode plugin to create a new Virtual environment (venv) using a version of Python that is equal or greater than 3.10. This should create a .venv directory. You can then activate it from the terminal.
-
-```
- .\.venv\Scripts\activate
-```
-
-VSCode Server
-
-If you are using the VSCode server running on EC2, your home directory will be /workshop. We need to create our virtual Python environment this way:
-
-```
-python -m venv ~/.venv
-source ~/.venv/bin/activate
-git clone https://github.com/094459/ada-python-demo-app.git
-cd ada-python-demo-app
-```
-
-If you are using VSCode running on EC2, I recommend using the inline browser that you can access from the link in the Ports tab. Whilst you can open a normal browser window, I found that it would often cache items. Feel free to experiment, and if you are seeing stale pages or updates not loading that you expect, try the inline browser and see if that changes. To access that, use the link as in the following screen shot.
-
-![how to launch the inline browser in VSCode server running on EC2](images/vscode-browser.png)
-
-> **Tip!** I have provided a CloudFormation tempalte that allows you to spin up VSCode running on EC2 in the [resources folder](resources/vscode-server.yaml)
-
+Most of this workshop has been designed to be standalone, and so you will not need an AWS Account. There is a final lab that will help take what you have created and deploy these to an AWS account. You will require you to have an AWS account to complete that final lab, as we will be deploying the application we develop into AWS. You can still complete the previous labs without an AWS account, so if you do not have access to one, then miss this lab out.
 
 **How do follow along**
 
@@ -99,14 +47,6 @@ Given the non deterministic nature of generative AI tools, the output you will g
 Everyone running through this lab will have a different experience, but I hope the takeaway from this is a better understanding of the flow you will start to develop in using these tools to write software.
 
 If you are working through this in a group setting, then the person running the lab will lead from the front and you can take your guidance from them.
-
-#  Introduction to next generation developer tools (45 min)
-
-To kick things off you will look at a quick overview of what we mean by generative AI developer tools. This will take a look at the typical use cases where developers can apply them, take a look at developer journeys in more detail, before finishing up with some tips as to how to use them effectively.
-
-![First slide of lecture](images/ppt-cover.png)
-
-This will set you up nicely for the practical hands on element, where we will actually do some of those use cases.
 
 # Setting up, and getting starting with Amazon Q Developer (20 min)
 
@@ -130,7 +70,7 @@ When you hear the term Builder ID when working with AWS services, this is the ac
 
 **Installing Amazon Q Developer**
 
-Now that we have our Builder ID profile, lets install the Amazon Q Developer plugin. From the Extensions side bar, click on the icon to view the extensions marketplace. Typically we would search for "Amazon Q Developer" and we would find and the use the Install link to install the plugin.(1) As of writing, v1.4 has a small issue which means we are going to install it a different way. [Download the v1.3](https://github.com/aws/aws-toolkit-vscode/releases/download/amazonq/v1.3.0/amazon-q-vscode-1.3.0.vsix) locally on your machine. From the Extension menu (2), click on the .. to open up the menu, and then select "Install from VSIX". This will bring up a file browser, and you will now select the file you downloaded (v1.3 of the plugin)
+Now that we have our Builder ID profile, lets install the Amazon Q Developer plugin. From the Extensions side bar, click on the icon to view the extensions marketplace. Search for "Amazon Q Developer" and you should be able to locate the Amazon Q Developer plugin (1). As of writing the latest version is v1.27.0. This is updated on a very regular basis, so make sure you either use the auto update, or check in regularly to take advantage of the improvements that are being made on a weekly basis.
 
 ![Installing the Amazon Q Developer plugin](images/q-vscode-install-1.png)
 
@@ -228,6 +168,25 @@ During the lecture you will have heard about large language model context sizes.
 Amazon Q Developer also uses things such as open tabs in VSCode, as well as key files depending on programming language (for example, the pom.xml in Java) to add additional information to help it make better suggestions.
 
 If you want to get low level and see this working, you can check the logging of the Amazon Q Developer plugin and see this in action.
+
+*Indexing your local workspace*
+
+Amazon Q Developer allows you to index your local workspace which can then be used as part of the context when using the Chat interface. This is a very powerful feature that allows you to bring in additional information to help steer the direction of the output from Amazon Q Developer. For example, maybe you have some existing coding standards you want to influence any code that is generated by Amazon Q. Another way that you can use this is to help personalise the kind of output that Amazon Q Developer generates. You will see some examples of this in the .qdeveloper folder. There are two files, once called "java-expert.md" and the other "opensource.md". These contain additional prompts that will shape the output. A common way you can use this is to create shorter output, perhaps just outputing the code rather than any explaination.
+
+You use this feature from within the Amazon Q Developer Chat interface. You invoke it with @ which will then display the available options. Currently this is only @workspace.
+
+To use @workspace however, you need to first set this up. From the Amazon Q Developer plugin settings, you will see some new options.
+
+![Amazon Q Developer plugin configuration options to enable workplace indexing](/images/q-workspace-settings.png)
+
+Once enabled you will need to restart VSCode. When you restart it, from the OUTPUT tab, there will new option - Amazon Q Language Server. The first time VSCode starts it will explore the current workspace and start to index files.
+
+
+![Amazon Q Developer workplace indexing logs](/images/q-workspace-index.png)
+
+!*Note!* This feature is still in preview, so there may be some rough edges. One thing I have found is that occasionally you might need to delete the indexes and then restart VSCode to kick of the re-index process.
+
+One the indexing has completed, @worksplace will be ready to go.
 
 
 *Amazon Q Developer logs*
@@ -1237,6 +1196,24 @@ If you have access to an AWS account, then you can use [the following Cloudforma
 This has all the developer tools you will need to run this lab, as well as experiment with other programming languages such as Java, Rust, .NET, and Node.
 
 I have been running this for a week, and the daily cost is around $1.50.
+
+*Setting up your Python environment*
+
+When using VSCode Server on EC2, your home directory will be /workshop. We need to create our virtual Python environment this way:
+
+```
+python -m venv ~/.venv
+source ~/.venv/bin/activate
+git clone https://github.com/094459/ada-python-demo-app.git
+cd ada-python-demo-app
+```
+
+If you are using VSCode running on EC2, I recommend using the inline browser that you can access from the link in the Ports tab. Whilst you can open a normal browser window, I found that it would often cache items. Feel free to experiment, and if you are seeing stale pages or updates not loading that you expect, try the inline browser and see if that changes. To access that, use the link as in the following screen shot.
+
+![how to launch the inline browser in VSCode server running on EC2](images/vscode-browser.png)
+
+> **Tip!** I have provided a CloudFormation tempalte that allows you to spin up VSCode running on EC2 in the [resources folder](resources/vscode-server.yaml)
+
 
 *Cleaning up and removing your VSCode on EC2*
 
